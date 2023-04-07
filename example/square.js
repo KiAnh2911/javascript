@@ -4,6 +4,6 @@
  */
 
 function square(a) {
-  return a * a;
+  return a ** a; // Math.pow(a, 2)
 }
 module.exports = square;
