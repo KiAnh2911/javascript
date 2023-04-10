@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>làm bài thực hiện biểu thức toán học</title>
+  </head>
+  <body>
+    <div class="exp">
+      <input type="text" placeholder="VD: 1 + 2 + 4 * 6 + (7 - 2)" />
+      <button>=</button>
+      <span></span>
+    </div>
+  </body>
+  <script>
+    var inputValue = document.querySelector(".exp input");
+    var btn = document.querySelector(".exp button");
+    var total = document.querySelector(".exp span");
+
+    btn.addEventListener("click", function () {
+      // Lấy giá trị biểu thức từ input
+      const expression = inputValue.value;
+
+      // Tách các số và toán tử từ biểu thức
+      const tokens = expression.match(/(\d+|\+|\-|\*|\/|\(|\))/g);
+
+      // Khởi tạo một mảng rỗng để lưu trữ các phép tính
+      const operators = [];
+
+      // Khởi tạo một mảng rỗng để lưu trữ các số hạng
+      const operands = [];
+
+      // Duyệt qua từng token trong biểu thức
+      tokens.forEach(function (token) {
+        if (/\d+/.test(token)) {
+          // Nếu token là số, push nó vào mảng operands
+          operands.push(parseFloat(token));
+        } else if (/[\+\-\*\/]/.test(token)) {
+          // Nếu token là toán tử, push nó vào mảng operators
+          while (
+            operators.length > 0 &&
+            precedence(operators[operators.length - 1]) >= precedence(token)
+          ) {
+            evaluate(operands, operators);
+          }
+
+          operators.push(token);
+        } else if (/\(/.test(token)) {
+          // Nếu token là dấu mở ngoặc, push nó vào mảng operators
+          operators.push(token);
+        } else if (/\)/.test(token)) {
+          // Nếu token là dấu đóng ngoặc, tính toán các phép tính trong dấu ngoặc
+          while (operators[operators.length - 1] !== "(") {
+            evaluate(operands, operators);
+          }
+
+          operators.pop();
+        }
+      });
+
+      // Tính toán các phép tính còn lại trong mảng operators và operands
+      while (operators.length > 0) {
+        evaluate(operands, operators);
+      }
+
+      // Hiển thị kết quả lên màn hình
+      total.textContent = `Kết quả: ${operands[0]}`;
+    });
+
+    // Hàm xác định độ ưu tiên của toán tử
+    function precedence(operator) {
+      switch (operator) {
+        case "+":
+        case "-":
+          return 1;
+        case "*":
+        case "/":
+          return 2;
+        default:
+          return 0;
+      }
+    }
+
+    // Hàm tính toán phép tính từ hai số hạng và một toán tử
+    function evaluate(operands, operators) {
+      const operator = operators.pop();
+      const rightOperand = operands.pop();
+      const leftOperand = operands.pop();
+
+      switch (operator) {
+        case "+":
+          operands.push(leftOperand + rightOperand);
+          break;
+        case "-":
+          operands.push(leftOperand - rightOperand);
+          break;
+        case "*":
+          operands.push(leftOperand * rightOperand);
+          break;
+        case "/":
+          operands.push(leftOperand / rightOperand);
+          break;
+        default:
+          break;
+      }
+    }
+  </script>
+</html>
